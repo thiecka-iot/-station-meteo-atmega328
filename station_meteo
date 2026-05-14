@@ -1,0 +1,47 @@
+
+// Station météo connectée — ATmega328
+// Thiécka Diouf — ESMT Dakar — 2026
+// Capteur DHT11 + Serveur web embarqué
+
+#include <DHT.h>
+
+#define DHTPIN    4      // broche DATA
+#define DHTTYPE   DHT11  // type capteur
+#define LED_PIN   13     // LED alerte
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  dht.begin();
+  Serial.println("Station météo démarrée !");
+  Serial.println("----------------------------");
+}
+
+void loop() {
+  float temp = dht.readTemperature();
+  float hum  = dht.readHumidity();
+
+  if (!isnan(temp) && !isnan(hum)) {
+    Serial.print("Température : ");
+    Serial.print(temp);
+    Serial.println(" °C");
+
+    Serial.print("Humidité    : ");
+    Serial.print(hum);
+    Serial.println(" %");
+
+    // Alerte si température > 30°C
+    if (temp > 30.0) {
+      digitalWrite(LED_PIN, HIGH);
+      Serial.println("ALERTE : Chaleur élevée !");
+    } else {
+      digitalWrite(LED_PIN, LOW);
+    }
+    Serial.println("----------------------------");
+  } else {
+    Serial.println("Erreur : capteur non détecté !");
+  }
+  delay(2000);
+}
